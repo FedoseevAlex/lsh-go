@@ -15,15 +15,15 @@ const (
 )
 
 type HashGetter interface {
-	Hash(dataParts [][]byte) ([][]byte, error)
+	Hash(dataParts [][]byte) ([]byte, error)
 }
 
 type CShakeHashFamily struct {
 	hashes []sha3.ShakeHash
 }
 
-func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([][]byte, error) {
-	result := make([][]byte, 0, len(dataParts))
+func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([]byte, error) {
+	result := make([]byte, 0, len(dataParts)*hashOutputSizeBytes)
 	for _, hash := range hf.hashes {
 		minHash := make([]byte, 0, hashOutputSizeBytes)
 		for _, part := range dataParts {
@@ -48,7 +48,7 @@ func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([][]byte, error) {
 				minHash = h
 			}
 		}
-		result = append(result, minHash)
+		result = append(result, minHash...)
 	}
 	return result, nil
 }
