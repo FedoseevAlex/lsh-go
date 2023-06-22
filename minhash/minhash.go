@@ -23,7 +23,7 @@ type CShakeHashFamily struct {
 }
 
 func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([]byte, error) {
-	result := make([]byte, 0, len(dataParts)*hashOutputSizeBytes)
+	result := make([]byte, 0, len(hf.hashes)*hashOutputSizeBytes)
 	for _, hash := range hf.hashes {
 		minHash := make([]byte, 0, hashOutputSizeBytes)
 		for _, part := range dataParts {
