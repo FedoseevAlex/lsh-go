@@ -1,7 +1,13 @@
 package jaccard
 
 func JaccardSimilarity[T comparable](first, second []T) float32 {
-	return float32(intersectionLen(first, second)) / float32(unionLen(first, second))
+	unionLength := unionLen(first, second)
+	if unionLength == 0 {
+		return 0
+	}
+
+	intersectionLength := intersectionLen(first, second)
+	return float32(intersectionLength) / float32(unionLength)
 }
 
 func unionLen[T comparable](first, second []T) int {
