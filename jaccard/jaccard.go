@@ -25,8 +25,8 @@ func intersectionLen[T comparable](first, second []T) int {
 		firstSet[elem] = struct{}{}
 	}
 
-	secondSet := make(map[T]struct{}, len(first))
-	for _, elem := range first {
+	secondSet := make(map[T]struct{}, len(second))
+	for _, elem := range second {
 		secondSet[elem] = struct{}{}
 	}
 
