@@ -11,7 +11,7 @@ import (
 
 const (
 	cshakeCustomisationSize = 10
-	hashOutputSizeBytes     = 20
+	defaultHashOutputLength = 20
 )
 
 type HashGetter interface {
@@ -19,20 +19,21 @@ type HashGetter interface {
 }
 
 type CShakeHashFamily struct {
-	hashes []sha3.ShakeHash
+	hashOutputLength int
+	hashes           []sha3.ShakeHash
 }
 
 func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([]byte, error) {
-	result := make([]byte, 0, len(hf.hashes)*hashOutputSizeBytes)
+	result := make([]byte, 0, len(hf.hashes)*hf.hashOutputLength)
 	for _, hash := range hf.hashes {
-		minHash := make([]byte, 0, hashOutputSizeBytes)
+		minHash := make([]byte, 0, hf.hashOutputLength)
 		for _, part := range dataParts {
 			_, err := hash.Write(part)
 			if err != nil {
 				return nil, fmt.Errorf("write to cshake hash function: %w", err)
 			}
 
-			h := make([]byte, hashOutputSizeBytes)
+			h := make([]byte, hf.hashOutputLength)
 			_, err = hash.Read(h)
 			if err != nil {
 				return nil, fmt.Errorf("read from cshake hash function: %w", err)
@@ -53,7 +54,15 @@ func (hf *CShakeHashFamily) Hash(dataParts [][]byte) ([]byte, error) {
 	return result, nil
 }
 
-func NewCShakeFamilyHashGetter(size int) HashGetter {
+func NewCShakeFamilyHashGetter(size, hashOutputLength int) (HashGetter, error) {
+	if size <= 0 {
+		return nil, fmt.Errorf("hash family size must be greater tnan zero")
+	}
+
+	if hashOutputLength <= 0 {
+		return nil, fmt.Errorf("hash output length must be greater tnan zero")
+	}
+
 	hashes := make([]sha3.ShakeHash, 0, size)
 	for i := 0; i < size; i++ {
 		cshakeCustomization := make([]byte, cshakeCustomisationSize)
@@ -64,5 +73,6 @@ func NewCShakeFamilyHashGetter(size int) HashGetter {
 
 		hashes = append(hashes, sha3.NewCShake128(cshakeCustomization, []byte{}))
 	}
-	return &CShakeHashFamily{hashes: hashes}
+
+	return &CShakeHashFamily{hashes: hashes, hashOutputLength: hashOutputLength}, nil
 }
