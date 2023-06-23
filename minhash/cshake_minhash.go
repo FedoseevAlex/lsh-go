@@ -10,8 +10,6 @@ import (
 
 // CHAKE based family of hash functions
 type CShakeHashFamily struct {
-	// Signature that can make your hashes reproducable
-	FamilySignature [][]byte
 	// Output lentgh that will be taken from each function in family
 	HashOutputLength int
 	hashes           []sha3.ShakeHash
@@ -51,8 +49,11 @@ func (hf *CShakeHashFamily) MinHash(dataParts [][]byte) ([]byte, error) {
 	return result, nil
 }
 
-func NewCShakeHashFamily(signature [][]byte) (*CShakeHashFamily, error) {
+func NewCShakeHashFamily(signature [][]byte, hashOutputLength int) (*CShakeHashFamily, error) {
 	// Input validation
+	if hashOutputLength <= 0 {
+		return nil, fmt.Errorf("hash output length must be greater than zero")
+	}
 	if len(signature) == 0 {
 		return nil, fmt.Errorf("hash signature size must be greater than zero")
 	}
@@ -71,7 +72,7 @@ func NewCShakeHashFamily(signature [][]byte) (*CShakeHashFamily, error) {
 		hashes = append(hashes, sha3.NewCShake128(signaturePart, nil))
 	}
 
-	return &CShakeHashFamily{hashes: hashes}, nil
+	return &CShakeHashFamily{hashes: hashes, HashOutputLength: hashOutputLength}, nil
 }
 
 // Just get random signature if you don't have one or don't care.
