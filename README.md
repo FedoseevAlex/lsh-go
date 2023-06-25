@@ -14,4 +14,4 @@ Using CHAKE customization we can easily make a bunch of hash functions and use t
 - Add examples for every hash method
 - Add more info here about locality sensitive hashing
 - Add some tests
-- TLSH support https://github.com/trendmicro/tlsh
+- [TLSH](https://github.com/trendmicro/tlsh) support
